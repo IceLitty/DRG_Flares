@@ -9,11 +9,11 @@
       "item": "minecraft:glowstone_dust"
     },
     {
-      "item": "minecraft:purple_dye"
+      "item": "minecraft:magenta_dye"
     }
   ],
   "result": {
-    "item": "drg_flares:drg_flare_purple",
-    "count": 32
+    "count": 32,
+    "id": "drg_flares:drg_flare_magenta"
   }
 }
