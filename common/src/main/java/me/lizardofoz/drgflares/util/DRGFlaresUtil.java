@@ -12,8 +12,6 @@ import me.lizardofoz.drgflares.mixin.RecipeManagerAccessor;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.sounds.EntityBoundSoundInstance;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -28,15 +26,16 @@ import net.minecraft.stats.Stats;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 public class DRGFlaresUtil
 {
     private DRGFlaresUtil() { }
 
+    /**
+     * Call this when server started, not loading mods, and event bus not use multi thread may not cause thread safe problem
+     */
     public static void removeFlareRecipes(RecipeManager recipeManager) {
         RecipeManagerAccessor accessor = (RecipeManagerAccessor) recipeManager;
         Multimap<RecipeType<?>, RecipeHolder<?>> newByType = HashMultimap.create();
@@ -127,16 +126,15 @@ public class DRGFlaresUtil
         return false;
     }
 
-    //We had to move these 2 methods outside, so that a Dedicated Server won't try to load Client-Only classes
     @Environment(EnvType.CLIENT)
     public static void playSoundFromEntityOnClient(Entity entity, SoundEvent sound, SoundSource category, float volume, float pitch)
     {
-        Minecraft.getInstance().getSoundManager().play(new EntityBoundSoundInstance(sound, category, volume, pitch, entity, new Random().nextLong()));
+        DRGFlaresClientUtil.playSoundFromEntityOnClient(entity, sound, category, volume, pitch);
     }
 
     @Environment(EnvType.CLIENT)
     public static void addEntityOnClient(Level world, Entity entity)
     {
-        ((ClientLevel) world).addEntity(entity);
+        DRGFlaresClientUtil.addEntityOnClient(world, entity);
     }
 }

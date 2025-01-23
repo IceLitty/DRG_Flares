@@ -1,13 +1,12 @@
 package me.lizardofoz.drgflares.neoforge.packet;
 
-import me.lizardofoz.drgflares.DRGFlares;
 import me.lizardofoz.drgflares.config.ServerSettings;
+import me.lizardofoz.drgflares.neoforge.util.PacketDistributorHelper;
 import me.lizardofoz.drgflares.packet.SpawnFlareEntityS2CPacket;
 import me.lizardofoz.drgflares.util.DRGFlarePlayerAspect;
 import me.lizardofoz.drgflares.util.FlareColor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.api.distmarker.Dist;
@@ -19,9 +18,6 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.handling.DirectionalPayloadHandler;
 import net.neoforged.neoforge.network.registration.HandlerThread;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 @EventBusSubscriber(modid = "drg_flares", bus = EventBusSubscriber.Bus.MOD)
 public final class PacketStuff
@@ -61,14 +57,7 @@ public final class PacketStuff
 
     public static Packet<ClientGamePacketListener> sendFlareSpawnS2CPacket(SpawnFlareEntityS2CPacket packet)
     {
-        try {
-            Method method = PacketDistributor.class.getDeclaredMethod("makeClientboundPacket", CustomPacketPayload.class, CustomPacketPayload[].class);
-            method.setAccessible(true);
-            return (Packet<ClientGamePacketListener>) method.invoke(null, packet, null);
-        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-            DRGFlares.LOGGER.error("Reflect to get vanilla packet error: " + e.getLocalizedMessage());
-            return null;
-        }
+        return (Packet<ClientGamePacketListener>) PacketDistributorHelper.makeClientboundPacket(packet);
     }
 
     @OnlyIn(Dist.CLIENT)

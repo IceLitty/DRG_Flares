@@ -1,12 +1,9 @@
 package me.lizardofoz.drgflares.packet;
 
+import lombok.Getter;
 import me.lizardofoz.drgflares.DRGFlares;
 import me.lizardofoz.drgflares.entity.FlareEntity;
 import me.lizardofoz.drgflares.util.FlareColor;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -18,6 +15,7 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.UUID;
 
+@Getter
 public class SpawnFlareEntityS2CPacket implements CustomPacketPayload
 {
     public static final ResourceLocation IDENTIFIER = ResourceLocation.fromNamespaceAndPath("drg_flares", "spawn_flare");
@@ -89,25 +87,6 @@ public class SpawnFlareEntityS2CPacket implements CustomPacketPayload
     public SpawnFlareEntityS2CPacket(FlareEntity entity, ServerEntity serverEntity)
     {
         this(entity.getId(), entity.getUUID(), serverEntity.getPositionBase().x(), serverEntity.getPositionBase().y(), serverEntity.getPositionBase().z(), serverEntity.getLastSentMovement(), entity.lifespan, entity.color, entity.bounceCount);
-    }
-
-    /** Please make sure you're calling it from the main thread */
-    @Environment(EnvType.CLIENT)
-    public void spawnOnClient()
-    {
-        ClientLevel world = Minecraft.getInstance().level;
-        if (world == null)
-            return;
-        FlareEntity entity = new FlareEntity(world, color);
-
-        entity.syncPacketPositionCodec(x, y, z);
-        entity.moveTo(x, y, z);
-        entity.setId(id);
-        entity.setUUID(uuid);
-        entity.lifespan = lifespan;
-        entity.color = color;
-        entity.bounceCount = bounceCount;
-        world.addEntity(entity);
     }
 
     public void write(FriendlyByteBuf buf)

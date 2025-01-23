@@ -32,10 +32,8 @@ public class ForgeEvents extends CommonEvents
         DRGFlarePlayerAspect.initOrReset();
 
         instance = new ForgeEvents();
-//        bus.register(new ForgeEvents());
         if (FMLEnvironment.dist == Dist.CLIENT)
             new Client();
-//            bus.register(new Client());
     }
 
     private ForgeEvents() { }
@@ -82,7 +80,7 @@ public class ForgeEvents extends CommonEvents
         }
 
         @SubscribeEvent
-        public static void onEvent(CustomizeGuiOverlayEvent event)
+        public static void onEvent(CustomizeGuiOverlayEvent.Chat event)
         {
             FlareHUDRenderer.render(event.getGuiGraphics(), event.getPartialTick().getGameTimeDeltaPartialTick(false));
         }
