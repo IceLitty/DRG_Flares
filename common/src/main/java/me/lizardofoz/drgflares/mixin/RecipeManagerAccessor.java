@@ -1,9 +1,10 @@
 package me.lizardofoz.drgflares.mixin;
 
-import net.minecraft.recipe.Recipe;
-import net.minecraft.recipe.RecipeManager;
-import net.minecraft.recipe.RecipeType;
-import net.minecraft.util.Identifier;
+import com.google.common.collect.Multimap;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
@@ -12,6 +13,12 @@ import java.util.Map;
 @Mixin(RecipeManager.class)
 public interface RecipeManagerAccessor
 {
-    @Accessor("recipes")
-    void setRecipes(Map<RecipeType<?>, Map<Identifier, Recipe<?>>> newRecipes);
+    @Accessor("byType")
+    Multimap<RecipeType<?>, RecipeHolder<?>> getByType();
+    @Accessor("byType")
+    void setByType(Multimap<RecipeType<?>, RecipeHolder<?>> newRecipes);
+    @Accessor("byName")
+    Map<ResourceLocation, RecipeHolder<?>> getByName();
+    @Accessor("byName")
+    void setByName(Map<ResourceLocation, RecipeHolder<?>> newRecipes);
 }

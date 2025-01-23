@@ -2,11 +2,11 @@ package me.lizardofoz.drgflares.block;
 
 import me.lizardofoz.drgflares.DRGFlareRegistry;
 import me.lizardofoz.drgflares.config.ServerSettings;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 public class FlareLightBlockEntity extends BlockEntity
 {
@@ -26,14 +26,14 @@ public class FlareLightBlockEntity extends BlockEntity
     {
         if (lifespan++ >= ServerSettings.CURRENT.lightSourceLifespanTicks.value)
         {
-            if (world.getBlockState(getPos()).getBlock() instanceof FlareLightBlock)
-                world.setBlockState(getPos(), Blocks.AIR.getDefaultState());
+            if (level.getBlockState(getBlockPos()).getBlock() instanceof FlareLightBlock)
+                level.setBlockAndUpdate(getBlockPos(), Blocks.AIR.defaultBlockState());
             else
-                markRemoved();
+                setRemoved();
         }
     }
 
-    public static void staticTick(World world, BlockPos blockPos, BlockState blockState, FlareLightBlockEntity blockEntity)
+    public static void staticTick(Level world, BlockPos blockPos, BlockState blockState, FlareLightBlockEntity blockEntity)
     {
         blockEntity.tick();
     }

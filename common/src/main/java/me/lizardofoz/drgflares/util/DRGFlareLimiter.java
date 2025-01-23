@@ -2,8 +2,8 @@ package me.lizardofoz.drgflares.util;
 
 import me.lizardofoz.drgflares.config.ServerSettings;
 import me.lizardofoz.drgflares.entity.FlareEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,7 +19,7 @@ import java.util.Map;
  */
 public class DRGFlareLimiter
 {
-    private static final Map<PlayerEntity, TrackerInstance> playerMap = new HashMap<>();
+    private static final Map<Player, TrackerInstance> playerMap = new HashMap<>();
 
     private DRGFlareLimiter() { }
 
@@ -29,12 +29,12 @@ public class DRGFlareLimiter
         playerMap.put(null, new TrackerInstance());
     }
 
-    public static void onPlayerJoin(PlayerEntity playerEntity)
+    public static void onPlayerJoin(Player playerEntity)
     {
         playerMap.put(playerEntity, new TrackerInstance());
     }
 
-    public static void onPlayerLeave(PlayerEntity playerEntity)
+    public static void onPlayerLeave(Player playerEntity)
     {
         playerMap.remove(playerEntity);
     }
@@ -58,7 +58,7 @@ public class DRGFlareLimiter
 
         TrackerInstance aspect = null;
         Entity owner = entity.getOwner();
-        if (owner instanceof PlayerEntity)
+        if (owner instanceof Player)
             aspect = playerMap.get(owner);
         if (aspect == null)
             aspect = playerMap.get(null);

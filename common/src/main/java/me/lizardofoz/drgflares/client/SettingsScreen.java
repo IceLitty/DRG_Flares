@@ -17,8 +17,8 @@ import me.shedaniel.clothconfig2.gui.entries.FloatListEntry;
 import me.shedaniel.clothconfig2.impl.builders.SubCategoryBuilder;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 
 @Environment(EnvType.CLIENT)
 public class SettingsScreen
@@ -32,13 +32,13 @@ public class SettingsScreen
         ConfigBuilder builder = ConfigBuilder.create()
                 .setParentScreen(parent)
                 .setSavingRunnable(SettingsScreen::onSave)
-                .setTitle(Text.translatable("drg_flares.settings.title"));
+                .setTitle(Component.translatable("drg_flares.settings.title"));
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
-        ConfigCategory category = builder.getOrCreateCategory(Text.translatable("drg_flares.settings.title"));
+        ConfigCategory category = builder.getOrCreateCategory(Component.translatable("drg_flares.settings.title"));
 
         //"About DRG Flares" Section
-        SubCategoryBuilder aboutSection = entryBuilder.startSubCategory(Text.translatable("drg_flares.settings.about.title"));
-        aboutSection.add(entryBuilder.startTextDescription(Text.translatable("drg_flares.settings.about.text",
+        SubCategoryBuilder aboutSection = entryBuilder.startSubCategory(Component.translatable("drg_flares.settings.about.title"));
+        aboutSection.add(entryBuilder.startTextDescription(Component.translatable("drg_flares.settings.about.text",
                 ServerSettings.CURRENT.secondsUntilDimmingOut.value, ServerSettings.CURRENT.andThenSecondsUntilFizzlingOut.value, ServerSettings.CURRENT.andThenSecondsUntilDespawn.value
         )).build());
         category.addEntry(aboutSection.build());
@@ -46,14 +46,14 @@ public class SettingsScreen
         //Client Settings
         category.addEntry(entryBuilder
                 .startIntSlider(
-                        Text.translatable(PlayerSettings.INSTANCE.flareColor.displayText),
+                        Component.translatable(PlayerSettings.INSTANCE.flareColor.displayText),
                         PlayerSettings.INSTANCE.flareColor.value.id,
                         -2, 15
                 )
                 .setDefaultValue(PlayerSettings.INSTANCE.flareColor.defaultValue.id)
                 .setSaveConsumer(it -> PlayerSettings.INSTANCE.flareColor.value = FlareColor.byId(it))
-                .setTextGetter(it -> Text.translatable(PlayerSettings.INSTANCE.flareColor.displayText + "." + it))
-                .setTooltip(Text.translatable(PlayerSettings.INSTANCE.flareColor.displayToolTip)).build());
+                .setTextGetter(it -> Component.translatable(PlayerSettings.INSTANCE.flareColor.displayText + "." + it))
+                .setTooltip(Component.translatable(PlayerSettings.INSTANCE.flareColor.displayToolTip)).build());
         addFloatEntry(category, entryBuilder, PlayerSettings.INSTANCE.flareUISlotX, true);
         addFloatEntry(category, entryBuilder, PlayerSettings.INSTANCE.flareUISlotY, true);
         addIntegerEntry(category, entryBuilder, PlayerSettings.INSTANCE.flareSoundVolume, true);
@@ -63,12 +63,12 @@ public class SettingsScreen
         if (DRGFlareRegistry.getInstance().serverSyncMode == ServerSyncMode.CLIENT_ONLY)
         {
             editable = true;
-            category.addEntry(entryBuilder.startTextDescription(Text.translatable("drg_flares.settings.server_desc_client_only")).build());
+            category.addEntry(entryBuilder.startTextDescription(Component.translatable("drg_flares.settings.server_desc_client_only")).build());
         }
         else if (editable)
-            category.addEntry(entryBuilder.startTextDescription(Text.translatable("drg_flares.settings.server_desc")).build());
+            category.addEntry(entryBuilder.startTextDescription(Component.translatable("drg_flares.settings.server_desc")).build());
         else
-            category.addEntry(entryBuilder.startTextDescription(Text.translatable("drg_flares.settings.disabled_by_server")).build());
+            category.addEntry(entryBuilder.startTextDescription(Component.translatable("drg_flares.settings.disabled_by_server")).build());
 
         //Server Settings
         ServerSettings serverSettings = editable ? ServerSettings.LOCAL : ServerSettings.CURRENT;
@@ -77,16 +77,16 @@ public class SettingsScreen
         addIntegerEntry(category, entryBuilder, serverSettings.regeneratingFlaresMaxCharges, editable);
         addIntegerEntry(category, entryBuilder, serverSettings.flareEntityLimitPerPlayer, editable);
         addBoolEntry(category, entryBuilder, serverSettings.flareRecipesInSurvival, editable);
-        category.addEntry(entryBuilder.startTextDescription(Text.literal(" ")).build());
+        category.addEntry(entryBuilder.startTextDescription(Component.literal(" ")).build());
 
         addIntegerEntry(category, entryBuilder, serverSettings.secondsUntilDimmingOut, editable);
         addIntegerEntry(category, entryBuilder, serverSettings.andThenSecondsUntilFizzlingOut, editable);
         addIntegerEntry(category, entryBuilder, serverSettings.andThenSecondsUntilDespawn, editable);
-        category.addEntry(entryBuilder.startTextDescription(Text.literal(" ")).build());
+        category.addEntry(entryBuilder.startTextDescription(Component.literal(" ")).build());
 
         addIntegerEntry(category, entryBuilder, serverSettings.fullBrightnessLightLevel, editable);
         addIntegerEntry(category, entryBuilder, serverSettings.dimmedLightLevel, editable);
-        category.addEntry(entryBuilder.startTextDescription(Text.literal(" ")).build());
+        category.addEntry(entryBuilder.startTextDescription(Component.literal(" ")).build());
 
         addIntegerEntry(category, entryBuilder, serverSettings.secondsUntilIdlingFlareGetsOptimized, editable);
         addIntegerEntry(category, entryBuilder, serverSettings.lightSourceLifespanTicks, editable);
@@ -94,23 +94,23 @@ public class SettingsScreen
         addIntegerEntry(category, entryBuilder, serverSettings.lightSourceSearchDistance, editable);
         addBoolEntry(category, entryBuilder, serverSettings.creativeUnlimitedRegeneratingFlares, editable);
         addBoolEntry(category, entryBuilder, serverSettings.serverSideLightSources, editable);
-        category.addEntry(entryBuilder.startTextDescription(Text.literal(" ")).build());
+        category.addEntry(entryBuilder.startTextDescription(Component.literal(" ")).build());
 
         addFloatEntry(category, entryBuilder, serverSettings.flareGravity, editable);
         addFloatEntry(category, entryBuilder, serverSettings.flareThrowSpeed, editable);
         addFloatEntry(category, entryBuilder, serverSettings.flareThrowAngle, editable);
         addFloatEntry(category, entryBuilder, serverSettings.flareSpeedBounceDivider, editable);
-        category.addEntry(entryBuilder.startTextDescription(Text.literal(" ")).build());
+        category.addEntry(entryBuilder.startTextDescription(Component.literal(" ")).build());
 
         try
         {
-            category.addEntry(entryBuilder.startTextDescription(Text.translatable("controls.title")).build());
-            category.addEntry(entryBuilder.fillKeybindingField(Text.translatable("drg_flares.keys.throw_flare"), PlayerSettings.INSTANCE.throwFlareKey).build());
-            category.addEntry(entryBuilder.fillKeybindingField(Text.translatable("drg_flares.keys.flare_mod_settings"), PlayerSettings.INSTANCE.flareModSettingsKey).build());
+            category.addEntry(entryBuilder.startTextDescription(Component.translatable("controls.title")).build());
+            category.addEntry(entryBuilder.fillKeybindingField(Component.translatable("drg_flares.keys.throw_flare"), PlayerSettings.INSTANCE.throwFlareKey).build());
+            category.addEntry(entryBuilder.fillKeybindingField(Component.translatable("drg_flares.keys.flare_mod_settings"), PlayerSettings.INSTANCE.flareModSettingsKey).build());
         }
         catch (Throwable e)
         {
-            category.addEntry(entryBuilder.startTextDescription(Text.translatable("drg_flares.settings.keybind_error")).build());
+            category.addEntry(entryBuilder.startTextDescription(Component.translatable("drg_flares.settings.keybind_error")).build());
         }
 
         return builder.build();
@@ -123,27 +123,27 @@ public class SettingsScreen
         {
             entry = entryBuilder
                     .startIntField(
-                            Text.translatable(settingsEntry.displayText),
+                            Component.translatable(settingsEntry.displayText),
                             settingsEntry.value
                     )
                     .setMin(settingsEntry.min)
                     .setDefaultValue(settingsEntry.defaultValue)
                     .setSaveConsumer(it -> settingsEntry.value = it)
-                    .setTooltip(Text.translatable(settingsEntry.displayText + ".desc"))
+                    .setTooltip(Component.translatable(settingsEntry.displayText + ".desc"))
                     .build();
         }
         else
         {
             entry = entryBuilder
                     .startIntSlider(
-                            Text.translatable(settingsEntry.displayText),
+                            Component.translatable(settingsEntry.displayText),
                             settingsEntry.value,
                             settingsEntry.min,
                             settingsEntry.max
                     )
                     .setDefaultValue(settingsEntry.defaultValue)
                     .setSaveConsumer(it -> settingsEntry.value = it)
-                    .setTooltip(Text.translatable(settingsEntry.displayText + ".desc"))
+                    .setTooltip(Component.translatable(settingsEntry.displayText + ".desc"))
                     .build();
         }
         entry.setEditable(editable);
@@ -154,14 +154,14 @@ public class SettingsScreen
     {
         FloatListEntry entry = entryBuilder
                 .startFloatField(
-                        Text.translatable(settingsEntry.displayText),
+                        Component.translatable(settingsEntry.displayText),
                         settingsEntry.value
                 )
                 .setMin(settingsEntry.min)
                 .setMax(settingsEntry.max)
                 .setDefaultValue(settingsEntry.defaultValue)
                 .setSaveConsumer(it -> settingsEntry.value = it)
-                .setTooltip(Text.translatable(settingsEntry.displayToolTip))
+                .setTooltip(Component.translatable(settingsEntry.displayToolTip))
                 .build();
         entry.setEditable(editable);
         category.addEntry(entry);
@@ -171,12 +171,12 @@ public class SettingsScreen
     {
         BooleanListEntry entry = entryBuilder
                 .startBooleanToggle(
-                        Text.translatable(settingsEntry.displayText),
+                        Component.translatable(settingsEntry.displayText),
                         settingsEntry.value
                 )
                 .setDefaultValue(settingsEntry.defaultValue)
                 .setSaveConsumer(it -> settingsEntry.value = it)
-                .setTooltip(Text.translatable(settingsEntry.displayToolTip))
+                .setTooltip(Component.translatable(settingsEntry.displayToolTip))
                 .build();
         entry.setEditable(editable);
         category.addEntry(entry);

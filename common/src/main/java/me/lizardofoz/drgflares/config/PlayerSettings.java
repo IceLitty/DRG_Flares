@@ -4,8 +4,8 @@ import com.google.common.collect.ImmutableList;
 import me.lizardofoz.drgflares.util.FlareColor;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
+import net.minecraft.client.KeyMapping;
+import com.mojang.blaze3d.platform.InputConstants;
 import org.lwjgl.glfw.GLFW;
 import java.io.File;
 import java.util.List;
@@ -15,15 +15,15 @@ public class PlayerSettings extends AbstractSettings
 {
     public static final PlayerSettings INSTANCE = new PlayerSettings(new File(".", "config/drg_flares_client.json"));
 
-    public final KeyBinding throwFlareKey = new KeyBinding(
+    public final KeyMapping throwFlareKey = new KeyMapping(
             "drg_flares.keys.throw_flare",
-            InputUtil.Type.KEYSYM,
+            InputConstants.Type.KEYSYM,
             GLFW.GLFW_KEY_V,
             "drg_flares.keys.category"
     );
-    public final KeyBinding flareModSettingsKey = new KeyBinding(
+    public final KeyMapping flareModSettingsKey = new KeyMapping(
             "drg_flares.keys.flare_mod_settings",
-            InputUtil.Type.KEYSYM,
+            InputConstants.Type.KEYSYM,
             GLFW.GLFW_KEY_RIGHT_BRACKET,
             "drg_flares.keys.category"
     );

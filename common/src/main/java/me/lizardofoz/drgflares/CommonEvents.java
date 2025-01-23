@@ -7,19 +7,20 @@ import me.lizardofoz.drgflares.config.ServerSettings;
 import me.lizardofoz.drgflares.util.*;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.recipe.Recipe;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeManager;
+
 import java.util.Collection;
 
 public abstract class CommonEvents
 {
-    protected abstract void sendSettingsSyncS2CPacket(ServerPlayerEntity player);
+    protected abstract void sendSettingsSyncS2CPacket(ServerPlayer player);
 
     protected void onServerStart(MinecraftServer server)
     {
@@ -30,9 +31,11 @@ public abstract class CommonEvents
         FlareLightBlock.refreshBlockStates();
         if (!ServerSettings.CURRENT.flareRecipesInSurvival.value)
         {
-            Collection<Recipe<?>> values = server.getRecipeManager().values();
-            values.removeIf(it -> it.getId().getNamespace().equals("drg_flares"));
-            DRGFlaresUtil.setRecipes(server.getRecipeManager(), values);
+            RecipeManager recipeManager = server.getRecipeManager();
+            DRGFlaresUtil.removeFlareRecipes(recipeManager);
+//            Collection<RecipeHolder<?>> values = server.getRecipeManager().getRecipes();
+//            values.removeIf(it -> it.id().getNamespace().equals("drg_flares"));
+//            DRGFlaresUtil.setRecipes(server.getRecipeManager(), values);
         }
     }
 
@@ -42,14 +45,14 @@ public abstract class CommonEvents
         DRGFlarePlayerAspect.tickAll();
     }
 
-    protected void onPlayerJoinServer(ServerPlayerEntity player)
+    protected void onPlayerJoinServer(ServerPlayer player)
     {
         DRGFlareLimiter.onPlayerJoin(player);
         DRGFlarePlayerAspect.onPlayerJoin(player);
         sendSettingsSyncS2CPacket(player);
     }
 
-    protected void onPlayerLeaveServer(PlayerEntity player)
+    protected void onPlayerLeaveServer(Player player)
     {
         DRGFlareLimiter.onPlayerLeave(player);
         DRGFlarePlayerAspect.onPlayerLeave(player);
@@ -60,29 +63,29 @@ public abstract class CommonEvents
     {
         protected abstract void sendFlareThrowC2SPacket(FlareColor color);
 
-        protected void onClientTick(MinecraftClient client)
+        protected void onClientTick(Minecraft client)
         {
-            ClientPlayerEntity player = client.player;
+            LocalPlayer player = client.player;
             if (player == null || client.isPaused())
                 return;
             DRGFlareLimiter.tick();
             DRGFlarePlayerAspect.clientLocal.tick();
 
-            if (DRGFlareRegistry.getInstance().isClothConfigLoaded() && PlayerSettings.INSTANCE.flareModSettingsKey.wasPressed())
-                client.setScreen(SettingsScreen.create(client.currentScreen));
+            if (DRGFlareRegistry.getInstance().isClothConfigLoaded() && PlayerSettings.INSTANCE.flareModSettingsKey.consumeClick())
+                client.setScreen(SettingsScreen.create(client.screen));
 
-            if (PlayerSettings.INSTANCE.throwFlareKey.wasPressed() && !DRGFlaresUtil.isRegenFlareOnCooldown(player))
+            if (PlayerSettings.INSTANCE.throwFlareKey.consumeClick() && !DRGFlaresUtil.isRegenFlareOnCooldown(player))
             {
                 if (DRGFlarePlayerAspect.clientLocal.checkFlareToss(player))
                 {
                     FlareColor flareColor = FlareColor.RandomColorPicker.unwrapRandom(PlayerSettings.INSTANCE.flareColor.value, true);
                     if (DRGFlareRegistry.getInstance().serverSyncMode != ServerSyncMode.SYNC_WITH_SERVER && ServerSettings.CURRENT.regeneratingFlaresEnabled.value)
-                        DRGFlarePlayerAspect.clientLocal.tryThrowRegeneratingFlare(MinecraftClient.getInstance().player, flareColor);
+                        DRGFlarePlayerAspect.clientLocal.tryThrowRegeneratingFlare(Minecraft.getInstance().player, flareColor);
                     else
                         sendFlareThrowC2SPacket(flareColor);
                 }
                 else if (ServerSettings.CURRENT.regeneratingFlaresEnabled.value)
-                    player.playSound(SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.MASTER, PlayerSettings.INSTANCE.flareSoundVolume.value / 1234f, 1.7f);
+                    player.playSound(SoundEvents.UI_BUTTON_CLICK.value(), PlayerSettings.INSTANCE.flareSoundVolume.value / 1234f, 1.7f);
             }
         }
 
